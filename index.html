@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendário DP 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#eaf5f7;
+--card:#ffffff;
+--text:#073b5c;
+--muted:#6d8794;
+--line:#cfe3e8;
+--brand:#073b5c;
+--brand2:#0f4c5c;
+--gold:#d6a51d;
+--danger:#dc2626;
+--teal:#0f4c5c;
+--aqua:#073b5c;
+}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top left,rgba(76,195,207,.30),transparent 34rem),radial-gradient(circle at top right,rgba(7,59,92,.18),transparent 30rem),linear-gradient(180deg,#f7fcfd,var(--bg));color:var(--text);padding:28px;min-height:100vh}
+.app{max-width:1520px;margin:auto}
+.top{background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(7,59,92,.12));border:1px solid var(--line);border-radius:30px;padding:26px;box-shadow:0 22px 60px rgba(7,59,92,.14);backdrop-filter:blur(10px);margin-bottom:20px;border-top:7px solid var(--brand2)}
+.toprow{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.tag{display:inline-block;background:#e8f3fb;color:var(--brand2);border:1px solid #cfe3f2;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.05;letter-spacing:-.045em;color:var(--brand);font-weight:950}
+.sub{color:var(--muted);font-size:15px;line-height:1.45;margin-top:10px;max-width:760px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.tabs{display:flex;gap:6px;background:#f5f9fc;border:1px solid var(--line);border-radius:17px;padding:6px}
+button{font:inherit}
+.tab{border:0;background:transparent;color:var(--brand);padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 8px 20px rgba(11,53,88,.18)}
+select,input{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:14px;padding:11px 13px;font-weight:800;outline:none}
+#busca{min-width:250px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.legend span{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:900}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:linear-gradient(180deg,#ffffff,#f4fbfc);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(7,59,92,.07)}
+.stat b{display:block;font-size:28px;color:var(--brand)}
+.stat span{color:var(--muted);font-size:13px;font-weight:800}
+.panel{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:30px;padding:18px;box-shadow:0 22px 60px rgba(7,59,92,.12);border-top:6px solid var(--brand2)}
+.panelhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px}
+.panelhead h2{color:var(--brand2);font-size:25px;letter-spacing:-.02em}
+.badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 11px;background:#eef6fb;color:var(--brand2);font-size:12px;font-weight:950;white-space:nowrap}
+.weekdays,.grid{display:grid;grid-template-columns:.65fr 1.15fr 1.15fr 1.15fr 1.15fr 1.15fr .65fr;gap:12px}
+.weekdays div{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;text-align:center;padding:11px 8px;border-radius:14px;font-size:13px;font-weight:950}
+.grid{margin-top:10px}
+.day{min-height:220px;background:linear-gradient(180deg,#fff,#f8fbfd);border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:0 8px 18px rgba(11,53,88,.05);transition:.18s ease}
+.day:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(11,53,88,.11);border-color:#b7d0e8}
+.day.empty{background:transparent;border:0;box-shadow:none}.day.empty:hover{transform:none}
+.num{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.num b{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--brand);background:#eef6fb;border-radius:999px;font-size:13px}
+.num small{color:var(--muted);font-size:11px;font-weight:900}
+.today{border:3px solid var(--gold)!important;background:#fff8dc!important;box-shadow:0 0 0 4px rgba(244,180,0,.15),0 16px 30px rgba(11,53,88,.12)!important}
+.ev{display:flex;align-items:flex-start;gap:7px;padding:7px 8px;margin-bottom:6px;border-radius:11px;color:#fff;font-size:11.3px;line-height:1.22;font-weight:800;white-space:normal;word-break:normal;overflow-wrap:anywhere;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 6px 12px rgba(11,53,88,.10)}
+.ev input{margin-top:1px;cursor:pointer;accent-color:#fff}.ev.done{opacity:.55;text-decoration:line-through}.ev.late{background:var(--danger)!important}.ev-text{display:flex;flex-direction:column;gap:5px;flex:1}.goal{display:flex;align-items:center;gap:7px}.goal small{font-size:10.5px;font-weight:950;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.22);padding:3px 7px;border-radius:999px;white-space:nowrap}.bar{height:5px;flex:1;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;background:rgba(255,255,255,.9);border-radius:999px}
+.azul{background:#073b5c}.verde{background:#168aa0}.roxo{background:#0f5f73}.laranja{background:#4cc3cf;color:#073b5c}.rosa{background:#8edce3;color:#073b5c}.vermelho{background:#092f49}
+.week{display:grid;grid-template-columns:.65fr 1.15fr 1.15fr 1.15fr 1.15fr 1.15fr .65fr;gap:12px}
+.weekday{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;min-height:430px}
+.weekday header{border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}.weekday h3{color:var(--brand);font-size:15px}.weekday p{color:var(--muted);font-size:12px;font-weight:900;margin-top:3px}.weekday.fora-mes{opacity:.55;background:#f8fbfd}
+.list{display:grid;gap:12px}.item{display:grid;grid-template-columns:130px 1fr auto;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 8px 18px rgba(11,53,88,.05)}.item-events{display:grid;gap:6px}
+.date{color:var(--brand);font-weight:950}.dow{color:var(--muted);font-size:12px;font-weight:900}
+.emptymsg{text-align:center;padding:34px;color:var(--muted);font-weight:900}
+@media(max-width:1150px){.stats{grid-template-columns:repeat(2,1fr)}.week{grid-template-columns:1fr}.weekday{min-height:auto}}
+@media(max-width:900px){body{padding:16px}.weekdays{display:none}.grid{grid-template-columns:repeat(2,1fr)}.item{grid-template-columns:1fr}#busca{min-width:100%}}
+@media(max-width:560px){.top,.panel{border-radius:22px;padding:16px}.grid,.stats{grid-template-columns:1fr}.controls,.tabs,select,#busca{width:100%}.tabs{justify-content:center}}
+
+.main-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+.goals-panel{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(247,252,253,.94));border:1px solid var(--line);border-radius:30px;padding:18px;box-shadow:0 22px 60px rgba(7,59,92,.10);border-top:6px solid var(--teal)}
+.goals-panel h2{color:var(--brand2);font-size:21px;letter-spacing:-.02em;margin-bottom:6px}
+.goals-panel .hint{color:var(--muted);font-size:12px;font-weight:800;line-height:1.35;margin-bottom:14px}
+.goal-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:10px;box-shadow:0 8px 18px rgba(11,53,88,.05)}
+.goal-card strong{display:block;color:var(--brand);font-size:13px;line-height:1.25;margin-bottom:8px}
+.goal-card small{display:block;color:var(--muted);font-size:11px;font-weight:850;margin:8px 0 6px}
+.goal-line{display:flex;align-items:center;gap:8px}
+.goal-line b{min-width:42px;color:var(--brand2);font-size:13px}
+.goal-bar{height:8px;flex:1;background:#e8f3fb;border-radius:999px;overflow:hidden}
+.goal-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand2),var(--brand));border-radius:999px}
+.ev-text{flex:1;display:block;white-space:normal;word-break:normal;overflow-wrap:anywhere;min-width:0}
+@media(max-width:1200px){.main-layout{grid-template-columns:1fr}}
+
+
+.achievement-panel{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:30px;padding:18px;box-shadow:0 22px 60px rgba(11,53,88,.10)}
+
+.config-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:10px}
+.config-card label{display:block;font-size:12px;font-weight:900;color:var(--muted);margin-bottom:6px}
+.config-card input{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;font-weight:800}
+.compare-line{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:900;margin-top:8px}
+.good{color:#166534}
+.bad{color:#991b1b}
+.neutral{color:#0b3558}
+
+
+.gestao-metas{max-height:none}
+.meta-unificada{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:12px;box-shadow:0 8px 18px rgba(11,53,88,.05)}
+.meta-unificada strong{display:block;color:var(--brand);font-size:13px;line-height:1.25;margin-bottom:10px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.meta-field label{display:block;font-size:11px;font-weight:900;color:var(--muted);margin-bottom:5px}
+.meta-field input{width:100%;border:1px solid var(--line);border-radius:12px;padding:9px;font-weight:850}
+.meta-resumo{display:grid;gap:8px;margin-top:10px}
+.meta-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:900}
+.meta-pill{border-radius:999px;padding:5px 9px;background:#eef6fb;color:var(--brand2);text-align:right;line-height:1.2}
+.meta-pill.good{background:#f0fdf4;color:#166534}
+.meta-pill.bad{background:#fff1f2;color:#991b1b}
+.meta-pill.neutral{background:#eef6fb;color:var(--brand2)}
+
+
+.app{max-width:1900px}
+
+.top{margin-bottom:20px}
+.toprow{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.tabs{display:flex;gap:6px;background:#f5f9fc;border:1px solid var(--line);border-radius:17px;padding:6px}
+
+.legend{display:none}
+
+
+
+
+.month-grid .ev{padding:6px 7px}
+.month-grid .ev input{flex:0 0 auto}
+.weekday .ev,.list .ev{font-size:11.5px;line-height:1.25}
+@media(max-width:1300px){.day{min-height:210px}.ev{font-size:10.5px}}
+
+
+@media(min-width:1500px){
+  body{padding:20px}
+  
+  .main-layout{grid-template-columns:minmax(0,1fr) 310px}
+  .day{min-height:235px}
+  .ev{font-size:11.6px}
+}
+
+
+.top,.goals-panel{max-width:100%;overflow:hidden}.panel{max-width:100%;overflow:visible!important}
+.grid,.weekdays{min-width:0}
+.day{min-width:0}
+
+
+.grid .day:nth-child(7n+1) .ev,
+.grid .day:nth-child(7n) .ev,
+.week .weekday:first-child .ev,
+.week .weekday:last-child .ev{font-size:10.2px}
+.grid .day:nth-child(7n+1),
+.grid .day:nth-child(7n),
+.week .weekday:first-child,
+.week .weekday:last-child{padding:8px}
+@media(max-width:900px){
+  .weekdays,.grid,.week{grid-template-columns:1fr}
+}
+
+
+
+
+
+.panel{overflow:visible!important}
+.weekdays{
+  position:-webkit-sticky!important;
+  position:sticky!important;
+  top:0!important;
+  z-index:999!important;
+  background:rgba(247,252,253,.98)!important;
+  padding:8px 0!important;
+  margin-bottom:8px!important;
+  backdrop-filter:blur(10px);
+}
+.weekdays div{
+  box-shadow:0 8px 18px rgba(7,59,92,.18)!important;
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<section class="top">
+  <div class="toprow">
+    <div><div class="tag">Calendário DP 2026</div><h1>Metas do Departamento Pessoal</h1><p class="sub">Visualização moderna em calendário mensal, semanal ou lista. Os checklists continuam salvos no navegador.</p></div>
+    <div class="controls">
+      <div class="tabs"><button class="tab active" data-view="mes">Mensal</button><button class="tab" data-view="semana">Semanal</button><button class="tab" data-view="lista">Lista</button></div>
+      <select id="mesSelect"></select><select id="semanaSelect" style="display:none"></select><select id="statusSelect"><option value="todas">Todas</option><option value="pendentes">Pendentes</option><option value="concluidas">Concluídas</option></select><input id="busca" type="search" placeholder="Buscar tarefa...">
+    </div>
+  </div>
+</section>
+<section class="stats"><div class="stat"><b id="s1">0</b><span>Tarefas</span></div><div class="stat"><b id="s2">0</b><span>Concluídas</span></div><div class="stat"><b id="s3">0</b><span>Pendentes</span></div><div class="stat"><b id="s4">0</b><span>Atrasadas</span></div></section>
+<div class="main-layout">
+<section class="panel"><div class="panelhead"><h2 id="titulo"></h2><span class="badge" id="modo">Mensal</span></div><div id="conteudo"></div></section>
+<aside class="goals-panel gestao-metas">
+  <h2>Gestão de Metas</h2>
+  <div class="hint">Informe o total e as atividades concluídas. O painel compara o realizado com a meta esperada da competência selecionada.</div>
+  <div id="gestaoMetasPainel"></div>
+</aside>
+</div>
+</div>
+<script>
+
+/* ===== CONFIGURAÇÃO GOOGLE SHEETS + APPS SCRIPT =====
+   Cole aqui a URL do Web App depois de publicar o Apps Script.
+   Exemplo: const API_URL = 'https://script.google.com/macros/s/XXXXX/exec';
+*/
+const API_URL = 'https://script.google.com/macros/s/AKfycbw6KdaeKUvSZ1-NmbcbJIbCxMDE93WrtE6DJ2Tx_3R1RQ9Y7kuX1GELXw2CtBkFXebQ/exec';
+let dadosOnline = { tarefas:{}, metas:{} };
+
+async function carregarDadosOnline(){
+ if(!API_URL) return;
+
+ try{
+   const resp = await fetch(API_URL + '?action=listar');
+   const data = await resp.json();
+
+   dadosOnline.tarefas = {};
+   (data.tarefas || []).forEach(t=>{
+     dadosOnline.tarefas[t.id] = String(t.concluida).toLowerCase() === 'true';
+   });
+
+   dadosOnline.metas = {};
+   (data.metas || []).forEach(m=>{
+     dadosOnline.metas[m.competencia + '|' + m.tarefa] = {
+       total:Number(m.total || 0),
+       concluidas:Number(m.concluidas || 0)
+     };
+   });
+ }catch(err){
+   console.warn('Não foi possível carregar dados online:', err);
+ }
+}
+
+async function salvarTarefaOnline(id, tarefa, data, concluida){
+ if(!API_URL) return;
+
+ try{
+   await fetch(API_URL, {
+     method:'POST',
+     body:JSON.stringify({
+       action:'salvarTarefa',
+       id,
+       tarefa,
+       data,
+       concluida
+     })
+   });
+ }catch(err){
+   console.warn('Não foi possível salvar tarefa online:', err);
+ }
+}
+
+async function salvarMetaOnline(competencia,tarefa,total,concluidas){
+ if(!API_URL) return;
+
+ try{
+   await fetch(API_URL, {
+     method:'POST',
+     body:JSON.stringify({
+       action:'salvarMeta',
+       competencia,
+       tarefa,
+       total,
+       concluidas
+     })
+   });
+ }catch(err){
+   console.warn('Não foi possível salvar meta online:', err);
+ }
+}
+
+function getTarefaSalva(id){
+ if(API_URL && id in dadosOnline.tarefas) return dadosOnline.tarefas[id];
+ return localStorage.getItem(id)==='true';
+}
+
+const meses=[
+{nome:'Maio',mes:4,ano:2026},
+{nome:'Junho',mes:5,ano:2026},
+{nome:'Julho',mes:6,ano:2026},
+{nome:'Agosto',mes:7,ano:2026},
+{nome:'Setembro',mes:8,ano:2026}
+];
+const tarefas=[
+{nome:'Importar Convênio',inicio:7,fim:8,cor:'azul'},
+{nome:'eSocial Eventos Mensais',inicio:8,fim:9,cor:'verde'},
+{nome:'eSocial Fechamento 1299',inicio:9,fim:15,cor:'roxo'},
+{nome:'FGTS/DCTFWEB',inicio:8,fim:18,cor:'laranja'},
+{nome:'Adiantamento Dia 15',inicio:11,fim:13,cor:'vermelho'},
+{nome:'Adiantamento Dia 20',inicio:12,fim:18,cor:'verde'},
+{nome:'Analisar CCT',inicio:21,fim:23,cor:'roxo'},
+{nome:'Cadastrar e Calcular Folha Normal – Pgto 5º dia',inicio:24,fim:25,cor:'laranja'},
+{nome:'Cadastrar Folha Com Variáveis - Pgto 5º dia',inicio:24,fim:25,cor:'vermelho'},
+{nome:'Consultar Consignado',inicio:26,fim:31,cor:'verde',somenteUteis:true}
+];
+const feriados=[
+  '2026-06-04',
+  '2026-09-07',
+  '2026-09-08'
+];
+function pad(n){return String(n).padStart(2,'0')}
+function key(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function br(d){return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`}
+function ehDiaUtil(data){const dia=data.getDay();return dia!==0&&dia!==6&&!feriados.includes(key(data))}
+function ajustarFimSemana(data){
+ const nova=new Date(data);
+
+ while(!ehDiaUtil(nova)){
+   // Regra especial: feriados de 07 e 08/09 devem consolidar no dia 09/09.
+   if(key(nova)==='2026-09-07' || key(nova)==='2026-09-08'){
+     nova.setDate(9);
+   }else if(nova.getDay()===6){
+     nova.setDate(nova.getDate()-1);
+   }else if(nova.getDay()===0){
+     nova.setDate(nova.getDate()-2);
+   }else{
+     nova.setDate(nova.getDate()+1);
+   }
+ }
+
+ return nova;
+}
+function subtrairDiasUteis(dataBase,dias){const data=new Date(dataBase);let removidos=0;while(removidos<dias){data.setDate(data.getDate()-1);if(ehDiaUtil(data))removidos++}return data}
+function ultimoDiaUtilDoMes(ano,mes){let data=new Date(ano,mes+1,0);while(!ehDiaUtil(data)){data.setDate(data.getDate()-1)}return data}
+function add(eventos,data,nome,cor){const k=key(data);if(!eventos[k])eventos[k]=[];if(!eventos[k].some(e=>e.nome===nome))eventos[k].push({nome,cor,data:new Date(data)})}
+function gerarEventosMes(item){
+ const eventos={};
+ tarefas.forEach(tarefa=>{
+   if(tarefa.nome==='Analisar CCT'){
+     let inicio=new Date(item.ano,item.mes,21);
+     if(inicio.getDay()===6)inicio.setDate(inicio.getDate()+2);
+     if(inicio.getDay()===0)inicio.setDate(inicio.getDate()+1);
+     let dias=0, loop=new Date(inicio);
+     while(dias<3){if(loop.getDay()!==0&&loop.getDay()!==6){add(eventos,new Date(loop),tarefa.nome,tarefa.cor);dias++}loop.setDate(loop.getDate()+1)}
+   } else if(tarefa.somenteUteis){
+     for(let dia=tarefa.inicio;dia<=tarefa.fim;dia++){let d=new Date(item.ano,item.mes,dia);if(d.getDay()!==0&&d.getDay()!==6)add(eventos,d,tarefa.nome,tarefa.cor)}
+   } else {
+     for(let dia=tarefa.inicio;dia<=tarefa.fim;dia++){add(eventos,ajustarFimSemana(new Date(item.ano,item.mes,dia)),tarefa.nome,tarefa.cor)}
+   }
+ });
+ let ultimoDiaUtil=ultimoDiaUtilDoMes(item.ano,item.mes);
+ let limiteGerar=subtrairDiasUteis(ultimoDiaUtil,3);
+ let dt=new Date(item.ano,item.mes,25);
+ while(dt<=limiteGerar){if(ehDiaUtil(dt))add(eventos,new Date(dt),'Gerar Tabelas de Importação','azul');dt.setDate(dt.getDate()+1)}
+ let ultimoUtil30=ultimoDiaUtilDoMes(item.ano,item.mes);
+ let penultimo=subtrairDiasUteis(ultimoUtil30,1);
+ if(penultimo.getDay()===6)penultimo.setDate(penultimo.getDate()-1);
+ for(let d=26;d<=penultimo.getDate();d++){let data=new Date(item.ano,item.mes,d);if(ehDiaUtil(data))add(eventos,new Date(data),'Cadastrar e Calcular Folhas Com Variáveis – Pgto Dia 30','roxo')}
+ if(item.mes>4){
+   let data=new Date(item.ano,item.mes,1), uteis=0, quinto=null;
+   while(uteis<5){const ehF=feriados.includes(key(data));if(data.getDay()!==0&&!ehF){uteis++;if(uteis===5)quinto=new Date(data)}if(uteis<5)data.setDate(data.getDate()+1)}
+   if(quinto.getDay()===6)quinto.setDate(quinto.getDate()-1);
+   let loop=new Date(item.ano,item.mes,1);
+   while(loop<quinto){if(ehDiaUtil(loop))add(eventos,new Date(loop),'Calcular Folhas Com Variáveis – Pgto 5º dia','verde');loop.setDate(loop.getDate()+1)}
+ }
+ return eventos;
+}
+const st={view:'mes',mes:0,semana:0,busca:'',status:'todas'};
+const mesSelect=document.getElementById('mesSelect'), semanaSelect=document.getElementById('semanaSelect'), statusSelect=document.getElementById('statusSelect'), conteudo=document.getElementById('conteudo'), gestaoMetasPainel=document.getElementById('gestaoMetasPainel');
+meses.forEach((m,i)=>{let o=document.createElement('option');o.value=i;o.textContent=`${m.nome} ${m.ano}`;mesSelect.appendChild(o)});
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');st.view=b.dataset.view;semanaSelect.style.display=st.view==='semana'?'':'none';render()});
+mesSelect.onchange=()=>{st.mes=+mesSelect.value;st.semana=0;render()};
+semanaSelect.onchange=()=>{st.semana=+semanaSelect.value;render()};
+statusSelect.onchange=()=>{st.status=statusSelect.value;render()};
+document.getElementById('busca').oninput=e=>{st.busca=e.target.value.trim().toLowerCase();render()};
+function idEvento(ev,k,i){
+ let chave=k || ev.k || key(ev.data);
+ return `${chave}-${ev.nome}`.replace(/\s+/g,'_');
+}
+
+function eventoConcluido(ev,k,i){
+ let novo=idEvento(ev,k,i);
+ if(getTarefaSalva(novo)) return true;
+
+ // compatibilidade com versões anteriores que usavam índice no ID
+ let chave=k || ev.k || key(ev.data);
+ let indice=(i!==undefined ? i : (ev.i!==undefined ? ev.i : 0));
+ let antigo=`${chave}-${ev.nome}-${indice}`.replace(/\s+/g,'_');
+
+ if(getTarefaSalva(antigo)){
+   localStorage.setItem(novo,'true');
+   return true;
+ }
+
+ return false;
+}
+
+function statusEvento(ev){
+ let done=eventoConcluido(ev);
+ return done?'concluida':'pendente';
+}
+function vis(ev){
+ let buscaOk=!st.busca||ev.nome.toLowerCase().includes(st.busca);
+ let statusOk=st.status==='todas'||(st.status==='pendentes'&&statusEvento(ev)==='pendente')||(st.status==='concluidas'&&statusEvento(ev)==='concluida');
+ return buscaOk&&statusOk;
+}
+
+function diasUteisEntre(inicio,fim){
+ let dias=[];
+ let d=new Date(inicio);
+ while(d<=fim){
+   if(ehDiaUtil(d)) dias.push(new Date(d));
+   d.setDate(d.getDate()+1);
+ }
+ return dias;
+}
+function pctMeta(ev){
+ let nome=ev.nome;
+ let d=new Date(ev.data);
+ let item=meses.find(m=>m.ano===d.getFullYear()&&m.mes===d.getMonth());
+ if(!item) return null;
+
+ if(nome==='Cadastrar e Calcular Folha Normal – Pgto 5º dia'){
+   let dias=diasUteisEntre(new Date(item.ano,item.mes,24),new Date(item.ano,item.mes,25));
+   let idx=dias.findIndex(x=>key(x)===key(d));
+   if(idx>=0) return Math.round(((idx+1)/dias.length)*100);
+ }
+
+ if(nome==='Cadastrar e Calcular Folhas Com Variáveis – Pgto Dia 30'){
+   let ultimoUtil=ultimoDiaUtilDoMes(item.ano,item.mes);
+   let penultimo=subtrairDiasUteis(ultimoUtil,1);
+   if(penultimo.getDay()===6) penultimo.setDate(penultimo.getDate()-1);
+   let dias=diasUteisEntre(new Date(item.ano,item.mes,26),penultimo);
+   let idx=dias.findIndex(x=>key(x)===key(d));
+   if(idx>=0) return Math.round(((idx+1)/dias.length)*100);
+ }
+
+ if(nome==='Calcular Folhas Com Variáveis – Pgto 5º dia'){
+   let data=new Date(item.ano,item.mes,1), uteis=0, quinto=null;
+   while(uteis<5){
+     if(data.getDay()!==0&&!feriados.includes(key(data))){
+       uteis++;
+       if(uteis===5) quinto=new Date(data);
+     }
+     if(uteis<5) data.setDate(data.getDate()+1);
+   }
+   if(quinto.getDay()===6) quinto.setDate(quinto.getDate()-1);
+   let limite=new Date(quinto);
+   limite.setDate(limite.getDate()-1);
+   let dias=diasUteisEntre(new Date(item.ano,item.mes,1),limite);
+   let idx=dias.findIndex(x=>key(x)===key(d));
+   if(idx>=0) return Math.round(((idx+1)/dias.length)*100);
+ }
+
+ if(nome==='FGTS/DCTFWEB' || nome==='FGTS/DCTFWEB'){
+   let dias=diasUteisEntre(new Date(item.ano,item.mes,8),new Date(item.ano,item.mes,18));
+   let idx=dias.findIndex(x=>key(x)===key(d));
+   if(idx>=0) return Math.round(((idx+1)/dias.length)*100);
+ }
+
+ return null;
+}
+function eh(ev,k,i){
+ let id=idEvento(ev,k,i);
+ let ok=eventoConcluido(ev,k,i);
+ let hoje=new Date();hoje.setHours(0,0,0,0);
+ let d=new Date(ev.data);d.setHours(0,0,0,0);
+ let late=d<hoje&&!ok;
+ return `<label class="ev ${ev.cor} ${ok?'done':''} ${late?'late':''}"><input type="checkbox" ${ok?'checked':''} onchange="check('${id}',this)"><span class="ev-text">${ev.nome}</span></label>`;
+}
+function tarefaPorId(id){
+ const partes=id.split('-');
+ const data=partes.slice(0,3).join('-');
+ const tarefa=id.substring(data.length+1).replace(/_/g,' ');
+ return {data,tarefa};
+}
+
+async function check(id,c){
+ localStorage.setItem(id,c.checked);
+ let info=tarefaPorId(id);
+ await salvarTarefaOnline(id,info.tarefa,info.data,c.checked);
+
+ let e=c.closest('.ev');
+
+ if(c.checked){
+   e.classList.add('done');
+   e.classList.remove('late');
+ }else{
+   e.classList.remove('done');
+
+   let hoje=new Date();
+   hoje.setHours(0,0,0,0);
+
+   let partes=id.split('-');
+   let dataId=new Date(Number(partes[0]),Number(partes[1])-1,Number(partes[2]));
+   dataId.setHours(0,0,0,0);
+
+   if(dataId<hoje){
+     e.classList.add('late');
+   }
+ }
+
+ stats();
+}
+function arr(eventos){let a=[];Object.keys(eventos).sort().forEach(k=>eventos[k].forEach((ev,i)=>a.push({...ev,k,i,data:new Date(ev.data)})));return a}
+function semanas(item){
+ let primeiro=new Date(item.ano,item.mes,1);
+ let inicio=new Date(primeiro);
+ inicio.setDate(primeiro.getDate()-primeiro.getDay());
+
+ let ultimo=new Date(item.ano,item.mes+1,0);
+ let fimCalendario=new Date(ultimo);
+ fimCalendario.setDate(ultimo.getDate()+(6-ultimo.getDay()));
+
+ let a=[];
+ let atual=new Date(inicio);
+
+ while(atual<=fimCalendario){
+   let ini=new Date(atual);
+   let fim=new Date(atual);
+   fim.setDate(ini.getDate()+6);
+   a.push({ini,fim});
+   atual.setDate(atual.getDate()+7);
+ }
+
+ return a;
+}
+function fillSemanas(item){
+ let ss=semanas(item);
+ semanaSelect.innerHTML='';
+ ss.forEach((s,i)=>{
+   let o=document.createElement('option');
+   o.value=i;
+   o.textContent=`Semana ${i+1} · ${pad(s.ini.getDate())}/${pad(s.ini.getMonth()+1)} a ${pad(s.fim.getDate())}/${pad(s.fim.getMonth()+1)}`;
+   semanaSelect.appendChild(o);
+ });
+ if(st.semana>=ss.length)st.semana=0;
+ semanaSelect.value=st.semana;
+}
+function renderMes(item,eventos){let primeiro=new Date(item.ano,item.mes,1).getDay(), total=new Date(item.ano,item.mes+1,0).getDate();let h='<div class="weekdays"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div></div><div class="grid">';for(let i=0;i<primeiro;i++)h+='<div class="day empty"></div>';for(let dia=1;dia<=total;dia++){let d=new Date(item.ano,item.mes,dia), k=key(d), evs=(eventos[k]||[]).filter(vis), hoje=new Date();hoje.setHours(0,0,0,0);let dc=new Date(d);dc.setHours(0,0,0,0);let ds=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d.getDay()];h+=`<div class="day ${dc.getTime()===hoje.getTime()?'today':''}"><div class="num"><b>${dia}</b><small>${ds}</small></div>${evs.map((ev,i)=>eh(ev,k,i)).join('')}</div>`}conteudo.innerHTML=h+'</div>'}
+function renderSemana(item,eventos){
+ let s=semanas(item)[st.semana];
+ let h='<div class="week">';
+
+ for(let i=0;i<7;i++){
+   let d=new Date(s.ini);
+   d.setDate(s.ini.getDate()+i);
+
+   let k=key(d);
+   let evs=(eventos[k]||[]).filter(vis);
+   let ds=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'][d.getDay()];
+   let foraMes=d.getMonth()!==item.mes;
+
+   h+=`<div class="weekday ${foraMes?'fora-mes':''}">
+     <header><h3>${ds}</h3><p>${br(d)}</p></header>
+     ${evs.length?evs.map((ev,i)=>eh(ev,k,i)).join(''):'<div class="emptymsg">Sem tarefas</div>'}
+   </div>`;
+ }
+
+ conteudo.innerHTML=h+'</div>';
+}
+function renderLista(item,eventos){
+ let a=arr(eventos).filter(vis);
+ if(!a.length){
+   conteudo.innerHTML='<div class="emptymsg">Nenhuma tarefa encontrada.</div>';
+   return;
+ }
+
+ let grupos={};
+ a.forEach(ev=>{
+   if(!grupos[ev.k]) grupos[ev.k]=[];
+   grupos[ev.k].push(ev);
+ });
+
+ conteudo.innerHTML='<div class="list">'+Object.keys(grupos).sort().map(k=>{
+   let grupo=grupos[k];
+   let data=grupo[0].data;
+   return `<div class="item">
+     <div>
+       <div class="date">${br(data)}</div>
+       <div class="dow">${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][data.getDay()]}</div>
+     </div>
+     <div class="item-events">
+       ${grupo.map(ev=>eh(ev,ev.k,ev.i)).join('')}
+     </div>
+     <span class="badge">${grupo.length} tarefa${grupo.length>1?'s':''}</span>
+   </div>`;
+ }).join('')+'</div>';
+}
+
+
+const tarefasMetaConfig=[
+ 'Calcular Folhas Com Variáveis – Pgto 5º dia',
+ 'FGTS/DCTFWEB',
+ 'Cadastrar e Calcular Folha Normal – Pgto 5º dia',
+ 'Cadastrar e Calcular Folhas Com Variáveis – Pgto Dia 30'
+];
+
+const defaultsTotais={
+ 'Cadastrar e Calcular Folha Normal – Pgto 5º dia':22,
+ 'Cadastrar e Calcular Folhas Com Variáveis – Pgto Dia 30':4,
+ 'Calcular Folhas Com Variáveis – Pgto 5º dia':55,
+ 'FGTS/DCTFWEB':156
+};
+
+function chaveCompetencia(item){
+ return `${item.ano}_${pad(item.mes+1)}`;
+}
+
+function chaveValor(tipo,nome,item){
+ return `${tipo}_${chaveCompetencia(item)}_${nome}`;
+}
+
+
+function salvarNumero(chave,valor){
+ localStorage.setItem(chave,valor);
+ render();
+}
+
+async function salvarMetaCampo(tipo,nome,item,valor){
+ localStorage.setItem(chaveValor(tipo,nome,item),valor);
+
+ let total = tipo==='total' ? Number(valor || 0) : obterTotal(nome,item);
+ let concluidas = tipo==='done' ? Number(valor || 0) : obterConcluidas(nome,item);
+
+ await salvarMetaOnline(chaveCompetencia(item),nome,total,concluidas);
+ await carregarDadosOnline();
+ render();
+}
+
+function obterTotal(nome,item){
+ let comp=chaveCompetencia(item);
+ let chave=comp+'|'+nome;
+ if(API_URL && dadosOnline.metas[chave]) return Number(dadosOnline.metas[chave].total || 0);
+ return Number(localStorage.getItem(chaveValor('total',nome,item)) || defaultsTotais[nome] || 0);
+}
+
+function obterConcluidas(nome,item){
+ let comp=chaveCompetencia(item);
+ let chave=comp+'|'+nome;
+ if(API_URL && dadosOnline.metas[chave]) return Number(dadosOnline.metas[chave].concluidas || 0);
+ return Number(localStorage.getItem(chaveValor('done',nome,item)) || 0);
+}
+
+
+
+
+
+function statusCompetencia(item){
+ let hoje=new Date();
+ hoje.setHours(0,0,0,0);
+
+ let inicioMes=new Date(item.ano,item.mes,1);
+ inicioMes.setHours(0,0,0,0);
+
+ let fimMes=new Date(item.ano,item.mes+1,0);
+ fimMes.setHours(0,0,0,0);
+
+ if(hoje<inicioMes) return 'futura';
+ if(hoje>fimMes) return 'passada';
+ return 'atual';
+}
+
+function dataReferenciaCompetencia(item,eventos){
+ let hoje=new Date();
+ hoje.setHours(0,0,0,0);
+
+ let status=statusCompetencia(item);
+
+ if(status==='atual'){
+   return hoje;
+ }
+
+ let metas=arr(eventos)
+   .map(ev=>({...ev,pct:pctMeta(ev)}))
+   .filter(ev=>ev.pct!==null)
+   .sort((a,b)=>a.data-b.data);
+
+ if(status==='futura'){
+   // Competência futura ainda não deve exigir cumprimento da meta.
+   let inicio=new Date(item.ano,item.mes,1);
+   inicio.setHours(0,0,0,0);
+   return inicio;
+ }
+
+ // Competência passada usa a última data prevista de metas.
+ if(metas.length){
+   let ref=new Date(metas[metas.length-1].data);
+   ref.setHours(0,0,0,0);
+   return ref;
+ }
+
+ return new Date(item.ano,item.mes+1,0);
+}
+
+
+function metaEsperadaAtual(nome,eventos,item){
+ let metas=arr(eventos)
+   .map(ev=>({...ev,pct:pctMeta(ev)}))
+   .filter(ev=>ev.nome===nome && ev.pct!==null)
+   .sort((a,b)=>a.data-b.data);
+
+ if(!metas.length){
+   return {pct:0, referencia:'Sem tarefa no mês'};
+ }
+
+ let status=statusCompetencia(item);
+
+ if(status==='futura'){
+   let primeira=new Date(metas[0].data);
+   primeira.setHours(0,0,0,0);
+   return {pct:0, referencia:`Competência futura · inicia em ${br(primeira)}`};
+ }
+
+ let referencia=dataReferenciaCompetencia(item,eventos);
+ referencia.setHours(0,0,0,0);
+
+ let primeira=new Date(metas[0].data);
+ primeira.setHours(0,0,0,0);
+
+ if(referencia<primeira){
+   return {pct:0, referencia:`Inicia em ${br(primeira)}`};
+ }
+
+ let metasAteReferencia=metas.filter(ev=>{
+   let d=new Date(ev.data);
+   d.setHours(0,0,0,0);
+   return d<=referencia;
+ });
+
+ if(metasAteReferencia.length){
+   let atual=metasAteReferencia[metasAteReferencia.length-1];
+   return {pct:atual.pct, referencia:`Base: ${br(atual.data)}`};
+ }
+
+ return {pct:0, referencia:'Ainda não iniciou'};
+}
+
+function renderGestaoMetas(item,eventos){
+ gestaoMetasPainel.innerHTML=tarefasMetaConfig.map(nome=>{
+   let total=obterTotal(nome,item);
+   let done=obterConcluidas(nome,item);
+   let doneInformado=localStorage.getItem(chaveValor('done',nome,item))!==null;
+   let realizado=total?Math.round((done/total)*100):0;
+   let metaInfo=metaEsperadaAtual(nome,eventos,item);
+   let esperado=metaInfo.pct;
+   let diff=realizado-esperado;
+
+   let statusClass=diff>=0?'good':'bad';
+   let statusTexto=diff>=0?'Adiantado':'Abaixo da meta';
+   if(!doneInformado){
+     diff=0;
+     statusClass='neutral';
+     statusTexto='Informe concluídas';
+   }
+
+   return `<div class="meta-unificada">
+     <strong>${nome}</strong>
+
+     <div class="meta-grid">
+       <div class="meta-field">
+         <label>Total</label>
+         <input type="number" value="${total}" min="0" onchange="salvarMetaCampo('total','${nome}',meses[st.mes],this.value)" >
+       </div>
+       <div class="meta-field">
+         <label>Concluídas</label>
+         <input type="number" value="${done}" min="0" onchange="salvarMetaCampo('done','${nome}',meses[st.mes],this.value)" >
+       </div>
+     </div>
+
+     <div class="meta-resumo">
+       <div class="meta-row">
+         <span>Meta esperada da competência</span>
+         <span class="meta-pill">${esperado}%</span>
+       </div>
+       <div class="meta-row">
+         <span>Referência</span>
+         <span class="meta-pill">${metaInfo.referencia}</span>
+       </div>
+       <div class="meta-row">
+         <span>Realizado na competência</span>
+         <span class="meta-pill">${realizado}%</span>
+       </div>
+       <div class="goal-line">
+         <b>${realizado}%</b>
+         <div class="goal-bar"><i style="width:${Math.min(realizado,100)}%"></i></div>
+       </div>
+       <div class="meta-row">
+         <span>Diferença</span>
+         <span class="meta-pill ${statusClass}">${diff>=0?'+':''}${diff}% · ${statusTexto}</span>
+       </div>
+     </div>
+   </div>`;
+ }).join('');
+}
+
+function stats(){let item=meses[st.mes], a=arr(gerarEventosMes(item)).filter(vis), hoje=new Date();hoje.setHours(0,0,0,0), ok=0, late=0;a.forEach(ev=>{let done=eventoConcluido(ev);let d=new Date(ev.data);d.setHours(0,0,0,0);if(done)ok++;if(d<hoje&&!done)late++});s1.textContent=a.length;s2.textContent=ok;s3.textContent=a.length-ok;s4.textContent=late}
+function render(){let item=meses[st.mes];mesSelect.value=st.mes;fillSemanas(item);let eventos=gerarEventosMes(item);titulo.textContent=`${item.nome} ${item.ano}`;modo.textContent={mes:'Mensal',semana:'Semanal',lista:'Lista'}[st.view];if(st.view==='mes')renderMes(item,eventos);if(st.view==='semana')renderSemana(item,eventos);if(st.view==='lista')renderLista(item,eventos);renderGestaoMetas(item,eventos);stats()}
+carregarDadosOnline().then(render);
+setInterval(()=>carregarDadosOnline().then(render),15000);
+</script>
+</body>
+</html>
